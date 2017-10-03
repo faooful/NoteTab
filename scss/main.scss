@@ -1,5 +1,9 @@
+@import 'typography';
 @import 'colours';
+@import 'notepad';
 
-p {
-  color: $red;
+body {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3rem;
 }
