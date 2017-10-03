@@ -1,18 +1,18 @@
-// document.getElementById("save").addEventListener("click", function ()
-// {
-//     var user = document.getElementById("notepad").value ;
-//     //localStorage["user"] = user ;
-//     localStorage.setItem("user", user) ;
-//     alert("gmail id saved") ;
-//     console.log("gmail id saved")
-//     console.log(user)
-// } , false);
+// addEventListener('keyup', function(event) {
+//   var notepad = document.getElementById('notepad').value;
+//   localStorage.setItem('notepad', notepad);
+//
+//   if (localStorage.getItem('notepad')) {
+//     // document.getElementById('notepad').html(localStorage.getItem('notepad'));
+//   }
+//
+//   console.log(notepad);
+// });
 
+addEventListener('keyup', function storeContent() {
+  var content = localStorage.getItem('content');
+  var notepad = document.getElementById('notepad');
 
-var notepad = document.getElementById('notepad');
-
-notepad.addEventListener('keyup', function(event) {
-  var content = document.getElementById('notepad').value;
-  localStorage["content"] = content;
-  console.log(content);
+  var notes = notepad.value = content;
+  console.log(notes);
 });
