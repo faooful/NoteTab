@@ -8,7 +8,23 @@ notepad.addEventListener("keyup", function getContent() {
   window.localStorage["notes"] = notepad.value;
 });
 
-var today = new Date();
-console.log(today);
+var d = new Date();
+var date = d.getDate();
 
-document.getElementById('date').innerHTML = 'Today is ' + today;
+//Convert getDay into a word
+var days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+];
+var day = days[d.getDay()]
+
+var fullDate = day;
+
+// console.log(d);
+
+document.getElementById('date').innerHTML = 'Today is ' + fullDate;
