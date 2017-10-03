@@ -10,6 +10,7 @@ notepad.addEventListener("keyup", function getContent() {
 
 var d = new Date();
 var date = d.getDate();
+var month = d.getMonth();
 
 //Convert getDay into a word
 var days = [
@@ -23,8 +24,24 @@ var days = [
 ];
 var day = days[d.getDay()]
 
-var fullDate = day;
+//Convert getMonth into a word
+var months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+];
+var month = months[d.getMonth()]
 
-// console.log(d);
+//Add all variables of the date
+var fullDate = day + ' the ' + date + ' of ' + month;
 
 document.getElementById('date').innerHTML = 'Today is ' + fullDate;
