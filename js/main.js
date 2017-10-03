@@ -42,6 +42,6 @@ var months = [
 var month = months[d.getMonth()]
 
 //Add all variables of the date
-var fullDate = day + ' the ' + date + ' of ' + month;
+var fullDate = day + ', ' + ' the ' + date + ' of ' + month;
 
 document.getElementById('date').innerHTML = 'Today is ' + fullDate;
