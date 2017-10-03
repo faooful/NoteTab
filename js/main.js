@@ -12,5 +12,7 @@
 var notepad = document.getElementById('notepad');
 
 notepad.addEventListener('keyup', function(event) {
-    console.log('test');
+  var content = document.getElementById('notepad').value;
+  localStorage["content"] = content;
+  console.log(content);
 });
