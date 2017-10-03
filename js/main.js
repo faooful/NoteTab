@@ -8,16 +8,7 @@ notepad.addEventListener("keyup", function getContent() {
   window.localStorage["notes"] = notepad.value;
 });
 
-//Get time and date
-function getDate() {
-  // Making 2 variable month and day
-  var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-  var dayNames= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+var today = new Date();
+console.log(today);
 
-  // make single object
-  var newDate = new Date();
-  // make current time
-  newDate.setDate(newDate.getDate());
-  // setting date and time
-  getElementById('date').html("It is" + ' ' + dayNames[newDate.getDay()] + ',' + ' ' + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
-};
+document.getElementById('date').innerHTML = 'Today is ' + today;
