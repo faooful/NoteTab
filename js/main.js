@@ -1,11 +1,11 @@
 var notepad = document.getElementById("notepad");
 
 if (window.localStorage["notes"]) {
-  notepad.value = window.localStorage["notes"];
+  notepad.innerHTML = window.localStorage["notes"];
 }
 
 notepad.addEventListener("keyup", function getContent() {
-  window.localStorage["notes"] = notepad.value;
+  window.localStorage["notes"] = notepad.innerHTML;
 });
 
 var d = new Date();
@@ -45,3 +45,5 @@ var month = months[d.getMonth()]
 var fullDate = day + ', ' + ' the ' + date + ' of ' + month;
 
 document.getElementById('date').innerHTML = 'Today is ' + fullDate;
+
+//Checking for keywods
