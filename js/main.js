@@ -1,11 +1,16 @@
 var notepad = document.getElementById("notepad");
+var words = ["email", "Email", "E-mail", "phone"]
 
 if (window.localStorage["notes"]) {
   notepad.innerHTML = window.localStorage["notes"];
 }
 
-notepad.addEventListener("keyup", function getContent() {
-  window.localStorage["notes"] = notepad.innerHTML;
+notepad.addEventListener("keydown", function() {
+ window.localStorage["notes"] = notepad.innerHTML;
+ if (notepad.innerHTML.indexOf('words')!== -1) {
+   words.forEach(word => { console.log(word); })
+   console.log('match');
+ }
 });
 
 var d = new Date();
@@ -45,5 +50,3 @@ var month = months[d.getMonth()]
 var fullDate = day + ', ' + ' the ' + date + ' of ' + month;
 
 document.getElementById('date').innerHTML = 'Today is ' + fullDate;
-
-//Checking for keywods
