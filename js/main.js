@@ -5,6 +5,10 @@ if (window.localStorage["notes"]) {
   notepad.innerHTML = window.localStorage["notes"];
 }
 
+notepad.addEventListener("keydown", function() {
+ window.localStorage["notes"] = notepad.innerHTML;
+});
+
 document.ondblclick = function () {
    var sel = (document.selection &&       document.selection.createRange().text) || (window.getSelection && window.getSelection().toString());
   var highlight  = '<span class="highlight">' + sel + '</span>';
