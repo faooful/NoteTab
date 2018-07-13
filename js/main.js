@@ -1,5 +1,6 @@
 var notepad = document.getElementById("notepad");
-var words = ["email", "Email", "E-mail", "phone"];
+var background = document.getElementById("background");
+var changeTheme = document.getElementById("themeChange");
 
 if (window.localStorage["notes"]) {
   notepad.innerHTML = window.localStorage["notes"];
@@ -8,6 +9,10 @@ if (window.localStorage["notes"]) {
 notepad.addEventListener("keydown", function() {
  window.localStorage["notes"] = notepad.innerHTML;
 });
+
+if (notepad.innerHTML.startsWith("#")) {
+  pDoc.parentNode.element.classList.add("test");
+}
 
 // document.ondblclick = function () {
 //    var sel = (document.selection &&       document.selection.createRange().text) || (window.getSelection && window.getSelection().toString());
@@ -53,3 +58,9 @@ var month = months[d.getMonth()]
 var fullDate = day + ', ' + ' the ' + date + ' of ' + month;
 
 document.getElementById('date').innerHTML = 'Today is ' + fullDate;
+
+changeTheme.addEventListener("click", themeChange);
+
+function themeChange() {
+  background.className += "red";
+}

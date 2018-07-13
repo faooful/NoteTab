@@ -1,6 +1,7 @@
 @import 'typography';
 @import 'colours';
 @import 'notepad';
+@import 'themes';
 
 body {
   max-width: 42rem;
@@ -8,11 +9,24 @@ body {
   padding: 3rem;
 }
 
-#date {
-  padding-bottom: 20px;
+#dateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding-bottom: 40px;
 }
 
-.highlight {
-  background: yellow;
-  color: blue;
+#date {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 14px;
+  opacity: .4;
+  color: $grey;
+}
+
+.emoji {
+  height: 1em !important;
+  width: 1em !important;
+  display: inline;
+  margin-right: 10px;
 }

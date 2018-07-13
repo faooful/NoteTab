@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="css/main.css">
+    <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
   </head>
-  <body>
-    <div id="date"></div>
-
-    <!-- <textarea value="content" placeholder="Let's remember something..." id="notepad"></textarea> -->
+  <body id="background">
+    <div id="dateContainer">
+      <i class="emoji em em-spiral_calendar_pad"></i><div id="date"></div>
+    </div>
 
     <div id="notepad" contenteditable="true" value="content"></div>
- 
+
     <script src="js/main.js"></script>
+    <script src="js/medium.js"></script>
+
+    <script>
+      new Medium({
+          element: document.getElementById('notepad')
+      });
+    </script>
   </body>
 </html>

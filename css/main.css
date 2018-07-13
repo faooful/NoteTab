@@ -18,16 +18,39 @@ body {
   background: transparent;
   opacity: 1 !important; }
 
+#themeChange {
+  height: 100px;
+  width: 100px;
+  background: red;
+  position: absolute;
+  bottom: 0;
+  right: 0; }
+
+.red {
+  background: red; }
+
 body {
   max-width: 42rem;
   margin: 0 auto;
   padding: 3rem; }
 
-#date {
-  padding-bottom: 20px; }
+#dateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding-bottom: 40px; }
 
-.highlight {
-  background: yellow;
-  color: blue; }
+#date {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 14px;
+  opacity: .4;
+  color: #5F6368; }
+
+.emoji {
+  height: 1em !important;
+  width: 1em !important;
+  display: inline;
+  margin-right: 10px; }
 
 /*# sourceMappingURL=main.css.map */
