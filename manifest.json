@@ -3,13 +3,10 @@
 
   "name": "NoteTab",
   "description": "Scratch pad for ideas and note taking in your new tabs.",
-  "version": "1.0",
+  "version": "1.2",
 
   "default_icon": "img/icon.png",
   "chrome_url_overrides": {
     "newtab": "index.html"
-  },
-  "permissions": [
-    "storage"
-  ]
+  }
 }

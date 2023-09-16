@@ -58,9 +58,3 @@ var month = months[d.getMonth()]
 var fullDate = day + ', ' + ' the ' + date + ' of ' + month;
 
 document.getElementById('date').innerHTML = 'Today is ' + fullDate;
-
-changeTheme.addEventListener("click", themeChange);
-
-function themeChange() {
-  background.className += "red";
-}
