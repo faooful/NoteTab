@@ -46,9 +46,6 @@ body {
 }
 
 #dateContainer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding-bottom: 24px; 
 }
 
@@ -65,13 +62,14 @@ body {
   margin-right: 10px; }
 
 .card {
-  padding: 24px 16px;
+  padding: 16px 16px;
   margin-bottom: 16px;
   border-radius: 8px;
   position: relative;
   cursor: move;  /* Makes it visually obvious that the card can be moved */
   transition: background-color 0.3s;
   border: 1px solid #e0e0e0;
+  box-shadow: 0 0 5px rgba(237,237,237,0.8);
 }
 
 .card p {
@@ -90,47 +88,64 @@ body {
 
 .deleteBtn {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  top: 16px;
+  right: 16px;
   padding: 5px 10px;
   border: none;
   cursor: pointer;
+  opacity: 0;
 }
 
-#entryBoxContainer {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 20;
+.card:hover .deleteBtn {
+  opacity: 1;
+}
+
+#entry-box-container {
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 #entryBox {
+  flex-grow: 1;
+  height: 40px;
   width: 100%;
+  resize: none;
+  background: #EDEDED;
+  border-radius: 8px;
+  line-height: 40px;
   border: none;
   outline: none;
-  padding: 10px;
-  box-sizing: border-box;
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
+  overflow: auto;
   transition: background-color 0.3s, box-shadow 0.3s;
   resize: none;
   font-family: 'Roboto', sans-serif;
-  display: none;
 }
 
-#closeEntryBoxBtn {
+#new-task-label {
   position: absolute;
-  top: 5px;    // Position it towards the top-right corner of the textarea
-  right: 5px;
-  background-color: transparent;
-  border: none;
-  font-size: 1rem;  // Adjust as needed
-  cursor: pointer;
-  padding: 2px;
-  display: none;  // Initially, keep it hidden
+  color: #5F6368;
+  font-weight: bold;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#cmd-shortcut {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.6); /* slightly transparent background */
+  padding: 0 5px;
+  border-radius: 5px;
+  font-size: 0.8em;
+  pointer-events: none; /* ensure it doesn't interfere with textarea interactions */
 }
 
 #entryBox:focus {
   display: block;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 0 5px rgba(237,237,237,0.8);
 }

@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+</head>
 
-  </head>
-  <body id="background">
+<body id="background">
     <div id="dateContainer">
-      <i class="emoji em em-spiral_calendar_pad"></i>
-      <div id="date"></div>
-      <button id="addTaskBtn">Add Task</button>  <!-- Moved inside the dateContainer -->
+        <i class="emoji em em-spiral_calendar_pad"></i>
+        <div id="date"></div>
     </div>
 
-    <div id="entryBoxContainer">
-      <textarea type="text" id="entryBox" placeholder="Enter your text here..."></textarea>
+    <div id="entry-box-container">
+      <label for="entryBox" id="new-task-label">New Task</label>
+      <textarea id="entryBox"></textarea>
+      <span id="cmd-shortcut">Cmd + K</span>
     </div>
-
+  
     <div id="notepad" value="content"></div>
 
     <script src="js/main.js"></script>
-  </body>
+</body>
+
 </html>
