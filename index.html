@@ -2,24 +2,26 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 
   </head>
   <body id="background">
     <div id="dateContainer">
-      <i class="emoji em em-spiral_calendar_pad"></i><div id="date"></div>
+      <i class="emoji em em-spiral_calendar_pad"></i>
+      <div id="date"></div>
+      <button id="addTaskBtn">Add Task</button>  <!-- Moved inside the dateContainer -->
     </div>
 
-    <div id="notepad" contenteditable="true" value="content"></div>
+    <div id="entryBoxContainer">
+      <textarea type="text" id="entryBox" placeholder="Enter your text here..."></textarea>
+    </div>
+
+    <div id="notepad" value="content"></div>
 
     <script src="js/main.js"></script>
-    <script src="js/medium.js"></script>
-
-    <script>
-      new Medium({
-          element: document.getElementById('notepad')
-      });
-    </script>
   </body>
 </html>

@@ -1,8 +1,8 @@
 body {
   font-size: 18px; }
 
-#notepad {
-  font-family: 'Nunito', sans-serif; }
+html {
+  font-family: 'Roboto', sans-serif; }
 
 #notepad {
   display: block;
@@ -24,11 +24,33 @@ body {
   margin: 0 auto;
   padding: 3rem; }
 
+  #addTaskBtn {
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-left: auto;
+    z-index: 10;
+  }
+  
+
+#taskContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: 200px;  /* or set your preferred max width */
+}
+
+#taskInput {
+  width: 100%;
+  box-sizing: border-box;
+  /* Add more styles for your textarea here */
+}
+
 #dateContainer {
   display: flex;
   align-items: center;
-  justify-content: left;
-  padding-bottom: 40px; }
+  justify-content: space-between;
+  padding-bottom: 24px; 
+}
 
 #date {
   display: inline-block;
@@ -42,4 +64,73 @@ body {
   display: inline;
   margin-right: 10px; }
 
-/*# sourceMappingURL=main.css.map */
+.card {
+  padding: 24px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  position: relative;
+  cursor: move;  /* Makes it visually obvious that the card can be moved */
+  transition: background-color 0.3s;
+  border: 1px solid #e0e0e0;
+}
+
+.card p {
+  margin-top: 8px;
+}
+
+.card small {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #5F6368;
+}
+
+.card:hover {
+  background-color: #f5f5f5;  /* Give some hover effect */
+}
+
+.deleteBtn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+#entryBoxContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+}
+
+#entryBox {
+  width: 100%;
+  border: none;
+  outline: none;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  resize: none;
+  font-family: 'Roboto', sans-serif;
+  display: none;
+}
+
+#closeEntryBoxBtn {
+  position: absolute;
+  top: 5px;    // Position it towards the top-right corner of the textarea
+  right: 5px;
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;  // Adjust as needed
+  cursor: pointer;
+  padding: 2px;
+  display: none;  // Initially, keep it hidden
+}
+
+#entryBox:focus {
+  display: block;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
