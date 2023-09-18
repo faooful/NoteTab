@@ -120,6 +120,7 @@ body {
   transition: background-color 0.3s, box-shadow 0.3s;
   resize: none;
   font-family: 'Roboto', sans-serif;
+  cursor: pointer;
 }
 
 #new-task-label {
