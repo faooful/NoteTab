@@ -1,12 +1,19 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
 
-  "name": "NoteTab",
-  "description": "Scratch pad for ideas and note taking in your new tabs.",
-  "version": "1.2",
+  "name": "Notes Tab",
+  "description": "A new tab replacement for taking notes",
+  "version": "1.0",
 
-  "default_icon": "img/icon.png",
+  "permissions": [
+    "storage"
+  ],
+
   "chrome_url_overrides": {
     "newtab": "index.html"
+  },
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

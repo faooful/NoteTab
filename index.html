@@ -8,21 +8,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+    <script src="js/marked.min.js"></script>
 </head>
 
 <body id="background">
-    <div id="dateContainer">
-        <i class="emoji em em-spiral_calendar_pad"></i>
-        <div id="date"></div>
+    <div id="main-container">
+        <div id="left-panel">
+            <div class="syntax-helper">
+                <div class="syntax-item question">
+                    <code>Q:</code> <span>Question</span>
+                </div>
+                <div class="syntax-item quote">
+                    <code>></code> <span>Quote</span>
+                </div>
+                <div class="syntax-item insight">
+                    <code>!</code> <span>Insight</span>
+                </div>
+                <div class="syntax-item action">
+                    <code>*</code> <span>Action</span>
+                </div>
+            </div>
+            <textarea id="full-text-entry" placeholder="Type your notes here..."></textarea>
+        </div>
+        <div id="right-panel">
+            <div class="sort-controls">
+                <button class="sort-button" data-sort="text-order">Sort by Text Order</button>
+                <button class="sort-button" data-sort="tag">Sort by Tag</button>
+            </div>
+            <div id="notepad"></div>
+        </div>
     </div>
-
-    <div id="entry-box-container">
-      <label for="entryBox" id="new-task-label">New Task</label>
-      <textarea id="entryBox"></textarea>
-      <span id="cmd-shortcut">Cmd + K</span>
-    </div>
-  
-    <div id="notepad" value="content"></div>
 
     <script src="js/main.js"></script>
 </body>
