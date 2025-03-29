@@ -2,8 +2,9 @@
 :root {
   --color-white: #ffffff;
   --radius-lg: 12px;
-  --spacing-lg: 24px;
+  --spacing-lg: 1.5rem;
   --transition-base: all 0.2s ease;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
 body {
@@ -11,7 +12,7 @@ body {
   padding: 0;
   font-size: 18px;
   max-width: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--font-sans);
   overflow: hidden;
 }
 
@@ -95,7 +96,7 @@ body {
   background-color: var(--color-white);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  transition: var(--transition-base);
+  transition: var(--transition-base), opacity 0.2s ease;
   height: auto;
   min-height: fit-content;
   display: flex;
@@ -103,7 +104,7 @@ body {
   position: relative;
   border: none;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  cursor: grab;
+  cursor: pointer;
   user-select: none;
 }
 
@@ -161,9 +162,10 @@ body {
   transform: translateY(-2px);
 }
 
-.card:active {
-  cursor: grabbing;
-  z-index: 1000;
+.card:active:not(.dragging) {
+  cursor: pointer;
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
 }
 
 .deleteBtn {
@@ -249,6 +251,8 @@ body {
 /* Add styles for markdown content */
 .card-content {
     display: block;
+    flex-grow: 1; /* Make content take up available space */
+    margin-bottom: 12px; /* Add spacing between content and tag */
 }
 
 .card-content p {
@@ -256,14 +260,16 @@ body {
     font-size: 20px;
     line-height: 1.4;
     color: #333;
+    font-family: var(--font-sans);
 }
 
 /* Style for the secondary text */
 .card-content p:last-child {
-    margin-top: 8px;
     font-size: 20px;
-    color: #666;
+    padding-bottom: 16px;
     opacity: 0.8;
+    line-height: 1.2;
+    color: #000;
 }
 
 .card-content ul, 
@@ -589,18 +595,28 @@ body {
     color: #333;
     font-size: 24px;
     font-weight: 500;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-sans);
 }
 
 #full-text-entry {
-    flex-grow: 1;
-    width: 100%;
-    padding: 20px;
-    border: none;
-    font-size: 16px;
-    line-height: 1.5;
-    resize: none;
-    background: #f9f9f9;
+    flex-grow: 1 !important;
+    width: 100% !important;
+    padding: 3em !important;
+    border: none !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    font-family: var(--font-sans);
+    background-color: white !important; /* Always white */
+}
+
+#full-text-entry:focus {
+    background-color: white !important; /* Keep white on focus */
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 /* Remove these unused classes:
@@ -612,43 +628,34 @@ body {
 
 /* Style the card tag */
 .card-tag {
-    padding: 6px 12px;
-    border-radius: 16px;
     font-size: 12px;
     font-weight: 500;
-    margin-bottom: 12px;
-    display: inline-block;
-    font-family: 'Roboto', sans-serif;
+    display: inline-flex;
+    font-family: var(--font-sans);
+    color: #6b7280;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    margin-top: auto; /* Remove fixed margin-top */
+    align-self: flex-start; /* Align tag to the left */
 }
 
-/* Style different card types with colored backgrounds */
+/* Update the card background colors to be lighter */
 .card.question {
-    background-color: #EEF3FF;
+    background-color: #dbeafe; /* Lighter blue */
 }
 
 .card.quote {
-    background-color: #F5F5F5;
+    background-color: #fee2e2; /* Light gray */
 }
 
 .card.insight {
-    background-color: #FFFBE6;
+    background-color: #f3e8ff; /* Light amber */
 }
 
 .card.action {
-    background-color: #E8F5E9;
-}
-
-/* Update card tag styles */
-.card-tag {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 8px;
-}
-
-/* Style the card content */
-.card-content {
-    line-height: 1.5;
-    flex-grow: 1;
+    background-color: #dcfce7; /* Light green */
 }
 
 /* Style the timestamp */
@@ -675,6 +682,7 @@ body {
     gap: 8px;
     font-size: 14px;
     color: #666;
+    font-family: var(--font-sans);
 }
 
 .syntax-item code {
@@ -687,43 +695,23 @@ body {
 
 /* Style each type differently */
 .syntax-item.question code {
-    background: #E3F2FD;
-    color: #1565C0;
+    background: #dbeafe; /* Matches card.question */
+    color: #1e40af; /* Darker blue for contrast */
 }
 
 .syntax-item.quote code {
-    background: #F3E5F5;
-    color: #6A1B9A;
+    background: #fee2e2; /* Matches card.quote */
+    color: #991b1b; /* Darker red for contrast */
 }
 
 .syntax-item.insight code {
-    background: #E8F5E9;
-    color: #2E7D32;
+    background: #f3e8ff; /* Matches card.insight */
+    color: #6b21a8; /* Darker purple for contrast */
 }
 
 .syntax-item.action code {
-    background: #FFEBEE;
-    color: #C62828;
-}
-
-/* Update the text area styles to work with the new helper */
-#full-text-entry {
-    flex-grow: 1;
-    width: 100%;
-    padding: 20px;
-    border: none;
-    font-size: 16px;
-    line-height: 1.5;
-    resize: none;
-    background: #f9f9f9;
-    box-sizing: border-box;
-}
-
-/* Remove or update any focus styles */
-#full-text-entry:focus {
-    background: #f9f9f9; /* Keep the same background color */
-    border: none;
-    box-shadow: none;
+    background: #dcfce7; /* Matches card.action */
+    color: #166534; /* Darker green for contrast */
 }
 
 /* Add placeholder styles */
@@ -770,6 +758,7 @@ body {
     font-size: 14px;
     color: #666;
     transition: all 0.2s ease;
+    font-family: var(--font-sans);
 }
 
 .sort-button:hover {
@@ -781,4 +770,23 @@ body {
     background: #4a90e2;
     color: white;
     border-color: #4a90e2;
+}
+
+/* Add styles for textarea selection */
+#full-text-entry::selection {
+    background-color: #dbeafe; /* Light blue background */
+    color: #1e40af; /* Darker blue text */
+}
+
+/* Add styles for card dimming */
+.card.dimmed {
+    opacity: 0.4;
+    transform: scale(0.98);
+}
+
+/* Keep the active card at full opacity */
+.card.active {
+    opacity: 1;
+    transform: none;
+    z-index: 2;
 }

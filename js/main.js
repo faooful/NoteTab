@@ -171,13 +171,36 @@ function makeDraggable(card) {
             return;
         }
 
-        e.preventDefault();
-        clearMergeStates();
+        // Don't start drag if it's just a click
+        const startX = e.clientX;
+        const startY = e.clientY;
         
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmousemove = elementDrag;
-        document.onmouseup = closeDragElement;
+        const onMouseMove = (moveEvent) => {
+            const deltaX = Math.abs(moveEvent.clientX - startX);
+            const deltaY = Math.abs(moveEvent.clientY - startY);
+            
+            // Only start drag if mouse has moved more than 5 pixels
+            if (deltaX > 5 || deltaY > 5) {
+                e.preventDefault();
+                clearMergeStates();
+                
+                pos3 = moveEvent.clientX;
+                pos4 = moveEvent.clientY;
+                document.onmousemove = elementDrag;
+                document.onmouseup = closeDragElement;
+                
+                // Remove the mousemove listener since we're now dragging
+                document.removeEventListener('mousemove', onMouseMove);
+            }
+        };
+        
+        // Add temporary mousemove listener to check for drag
+        document.addEventListener('mousemove', onMouseMove);
+        
+        // Remove listener if mouse is released without dragging
+        document.addEventListener('mouseup', () => {
+            document.removeEventListener('mousemove', onMouseMove);
+        }, { once: true });
     }
 
     function elementDrag(e) {
@@ -846,26 +869,47 @@ let dropTarget = null;
 
 function createCardWithTag(type, content) {
     const tagIcons = {
-        'question': '❓ Question',
-        'quote': '💬 Quote',
-        'insight': '💡 Insight',
-        'action': '✅ Action'
+        'question': 'Question',
+        'quote': 'Quote',
+        'insight': 'Insight',
+        'action': 'Action'
     };
     
     const card = document.createElement("div");
     card.className = `card ${type}`;
     card.setAttribute("draggable", "true");
     
-    const tagElement = document.createElement("div");
-    tagElement.className = 'card-tag';
-    tagElement.innerHTML = tagIcons[type];
+    // Add click handler
+    card.addEventListener('click', (e) => {
+        // Don't trigger on delete button or during drag
+        if (!e.target.classList.contains('deleteBtn') && 
+            !card.classList.contains('dragging')) {
+            
+            // Remove active state from all cards and dim them
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.add('dimmed');
+                c.classList.remove('active');
+            });
+            
+            // Make clicked card active and undimmed
+            card.classList.remove('dimmed');
+            card.classList.add('active');
+            
+            highlightTextInTextArea(content, type);
+        }
+    });
     
     const contentDiv = document.createElement("div");
     contentDiv.className = "card-content";
     contentDiv.innerHTML = `<p>${content}</p>`;
     
-    card.appendChild(tagElement);
+    const tagElement = document.createElement("div");
+    tagElement.className = 'card-tag';
+    tagElement.innerHTML = tagIcons[type];
+    
+    // Change the order: first content, then tag
     card.appendChild(contentDiv);
+    card.appendChild(tagElement);
     
     const notepad = document.getElementById('notepad');
     notepad.appendChild(card);
@@ -1114,3 +1158,42 @@ function sortCards(sortType) {
     cards.forEach(card => notepad.appendChild(card));
     updateLocalStorage();
 }
+
+// Add this function to scroll to and highlight text in textarea
+function highlightTextInTextArea(content, type) {
+    const textArea = document.getElementById('full-text-entry');
+    const markers = {
+        'question': 'Q:',
+        'quote': '>',
+        'insight': '!',
+        'action': '*'
+    };
+    
+    const marker = markers[type];
+    const lines = textArea.value.split('\n');
+    const lineIndex = findCardLine(textArea.value, content, type);
+    
+    if (lineIndex !== -1) {
+        // Calculate the position to scroll to
+        const lineStart = lines.slice(0, lineIndex).join('\n').length + (lineIndex > 0 ? 1 : 0);
+        const lineEnd = lineStart + lines[lineIndex].length;
+        
+        // Set selection range to highlight the text
+        textArea.focus();
+        textArea.setSelectionRange(lineStart, lineEnd);
+        
+        // Scroll the line into view
+        const lineHeight = parseInt(getComputedStyle(textArea).lineHeight);
+        const scrollPosition = lineHeight * lineIndex;
+        textArea.scrollTop = scrollPosition - textArea.clientHeight / 2;
+    }
+}
+
+// Add click handler to clear active state when clicking outside cards
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.card')) {
+        document.querySelectorAll('.card').forEach(card => {
+            card.classList.remove('dimmed', 'active');
+        });
+    }
+});
