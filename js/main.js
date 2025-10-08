@@ -1,15 +1,14 @@
 const notepad = document.getElementById("notepad");
 
-// Initialize cardsArray at the top level
-let cardsArray = [];
-
 // Add this at the top of your file with other global variables
 let activeContextMenu = null;
 
 // Add this constant at the top with other global variables
 const STORAGE_KEYS = {
     CARDS: 'cardsArray',
-    TEXT_AREA: 'textAreaContent'
+    TEXT_AREA: 'textAreaContent',
+    VIEW_STATE: 'viewState',
+    THEME: 'theme'
 };
 
 // Add these variables at the top of your file
@@ -31,12 +30,12 @@ function adjustHeight() {
 // Keep only the necessary event listener for keyboard shortcuts
 document.addEventListener("keydown", function(e) {
     if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
+      e.preventDefault();
         document.getElementById('full-text-entry').focus();
     }
 });
 
-// Update the click event listener to remove entryBox references
+// Update the click event listener for delete buttons
 document.addEventListener("click", function(e) {
     if (e.target && e.target.className == "deleteBtn") {
         const card = e.target.closest('.card');
@@ -56,8 +55,6 @@ document.addEventListener("click", function(e) {
             textArea.value = lines.join('\n');
             saveTextAreaContent(textArea.value);
         }
-        
-        updateLocalStorage();
     }
 });
 
@@ -305,6 +302,11 @@ function mergeCards(card1, card2) {
 
 function renderCards() {
     const notepad = document.getElementById('notepad');
+    if (!notepad) {
+        console.error('Notepad element not found');
+        return;
+    }
+    
     notepad.innerHTML = ''; // Clear existing cards
     
     // Sort cards by order before rendering
@@ -317,19 +319,8 @@ function renderCards() {
 
 // Update updateLocalStorage function to include order
 function updateLocalStorage() {
-    const updatedCards = Array.from(document.querySelectorAll(".card")).map(cardElement => ({
-        text: cardElement.querySelector(".card-content").textContent,
-        type: Array.from(cardElement.classList).find(c => ['question', 'quote', 'insight', 'action'].includes(c))
-    }));
-    
-    cardsArray = updatedCards;
-    chrome.storage.local.set({ 
-        [STORAGE_KEYS.CARDS]: updatedCards
-    }, function() {
-        if (chrome.runtime.lastError) {
-            console.error('Error saving cards:', chrome.runtime.lastError);
-        }
-    });
+    const textArea = document.getElementById('full-text-entry');
+    saveTextAreaContent(textArea.value);
 }
 
 // Add this function to your main.js
@@ -478,11 +469,11 @@ function addContextMenu(card) {
         });
 
         // Close menu when clicking outside
-        setTimeout(() => {
+    setTimeout(() => {
             document.addEventListener('click', closeContextMenu);
             document.addEventListener('contextmenu', closeContextMenu);
-        }, 0);
-    });
+    }, 0);
+});
 }
 
 // Update the closeContextMenu function to be more thorough
@@ -562,7 +553,7 @@ function addReminder(card) {
     reminderBtn.onclick = () => {
         const time = prompt('Set reminder (minutes):');
         if (time) {
-            setTimeout(() => {
+    setTimeout(() => {
                 card.style.animation = 'shake 0.5s';
                 new Notification('Note Reminder', {
                     body: card.querySelector('.card-content').textContent
@@ -760,20 +751,14 @@ Q: Question
     initializeAutoParsing(textArea);
 }
 
-// Update the initializeAutoParsing function to include saving text area content
+// Update the initializeAutoParsing function
 function initializeAutoParsing(textArea) {
-    let typingTimer;
-    const doneTypingInterval = 1000;
-    
-    textArea.addEventListener('input', () => {
-        clearTimeout(typingTimer);
-        const content = textArea.value;
+    textArea.addEventListener('input', (e) => {
+        // Parse all text and update cards whenever the text changes
+        parseNotes(textArea.value);
         
-        // Save text area content immediately
-        saveTextAreaContent(content);
-        
-        // Parse notes after delay
-        typingTimer = setTimeout(() => parseNotes(content), doneTypingInterval);
+        // Save text area content
+        saveTextAreaContent(textArea.value);
     });
 }
 
@@ -788,7 +773,7 @@ function saveTextAreaContent(content) {
     });
 }
 
-// Add this function to find the line that created a specific card
+// Update findCardLine to be more precise in matching
 function findCardLine(text, cardContent, cardType) {
     const lines = text.split('\n');
     const markers = {
@@ -811,24 +796,19 @@ function findCardLine(text, cardContent, cardType) {
     });
 }
 
-// Update parseNotes to track the relationship between lines and cards
+// Update parseNotes to handle empty state
 function parseNotes(text) {
     const lines = text.split('\n');
-    const existingCards = Array.from(document.querySelectorAll('.card'));
+    const notepad = document.getElementById('notepad');
+    const textArea = document.getElementById('full-text-entry');
+    const viewToggle = document.querySelector('.view-toggle');
     
-    // Remove cards that no longer have corresponding text
-    existingCards.forEach(card => {
-        const cardContent = card.querySelector('.card-content').textContent.trim();
-        const cardType = Array.from(card.classList).find(c => ['question', 'quote', 'insight', 'action'].includes(c));
-        const lineIndex = findCardLine(text, cardContent, cardType);
-        
-        if (lineIndex === -1) {
-            card.remove();
-            updateLocalStorage();
-        }
-    });
+    // Clear all existing cards
+    notepad.innerHTML = '';
     
-    // Create new cards for new lines
+    let hasCards = false;
+    
+    // Create cards for each valid line
     lines.forEach((line, index) => {
         const trimmedLine = line.trim();
         if (trimmedLine) {
@@ -850,24 +830,33 @@ function parseNotes(text) {
             }
             
             if (type && content) {
-                // Check if card already exists
-                const existingCard = Array.from(document.querySelectorAll('.card')).find(card => {
-                    const cardContent = card.querySelector('.card-content').textContent.trim();
-                    return cardContent === content && card.classList.contains(type);
-                });
-                
-                if (!existingCard) {
-                    createCardWithTag(type, content, index);
-                }
+                createCardWithTag(type, content);
+                hasCards = true;
             }
         }
     });
+
+    // If no cards were created, switch to text view
+    if (!hasCards) {
+        notepad.classList.remove('active');
+        textArea.style.display = 'block';
+        if (viewToggle) {
+            viewToggle.textContent = 'Show Cards';
+        }
+        saveViewState(false);
+    }
 }
 
 let draggedCard = null;
 let dropTarget = null;
 
 function createCardWithTag(type, content) {
+    const notepad = document.getElementById('notepad');
+    if (!notepad) {
+        console.error('Notepad element not found');
+        return;
+    }
+
     const tagIcons = {
         'question': 'Question',
         'quote': 'Quote',
@@ -877,14 +866,16 @@ function createCardWithTag(type, content) {
     
     const card = document.createElement("div");
     card.className = `card ${type}`;
-    card.setAttribute("draggable", "true");
+    
+    // Create delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerHTML = "❌";
+    deleteBtn.className = "deleteBtn";
     
     // Add click handler
     card.addEventListener('click', (e) => {
-        // Don't trigger on delete button or during drag
-        if (!e.target.classList.contains('deleteBtn') && 
-            !card.classList.contains('dragging')) {
-            
+        // Don't trigger on delete button
+        if (!e.target.classList.contains('deleteBtn')) {
             // Remove active state from all cards and dim them
             document.querySelectorAll('.card').forEach(c => {
                 c.classList.add('dimmed');
@@ -907,81 +898,14 @@ function createCardWithTag(type, content) {
     tagElement.className = 'card-tag';
     tagElement.innerHTML = tagIcons[type];
     
-    // Change the order: first content, then tag
+    // Change the order: first delete button, then content, then tag
+    card.appendChild(deleteBtn);
     card.appendChild(contentDiv);
     card.appendChild(tagElement);
     
-    const notepad = document.getElementById('notepad');
     notepad.appendChild(card);
     
-    // Add drag and drop event listeners
-    card.addEventListener('dragstart', handleDragStart);
-    card.addEventListener('dragend', handleDragEnd);
-    card.addEventListener('dragover', handleDragOver);
-    card.addEventListener('drop', handleDrop);
-    
     updateLocalStorage();
-    return card;
-}
-
-function handleDragStart(e) {
-    draggedCard = e.target;
-    e.target.classList.add('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    if (!draggedCard || e.currentTarget === draggedCard) return;
-    
-    const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const midpoint = rect.top + rect.height / 2;
-    
-    document.querySelectorAll('.card').forEach(c => {
-        c.classList.remove('drop-before', 'drop-after');
-    });
-    
-    if (e.clientY < midpoint) {
-        card.classList.add('drop-before');
-    } else {
-        card.classList.add('drop-after');
-    }
-    
-    dropTarget = card;
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!draggedCard || !dropTarget) return;
-    
-    const isBefore = dropTarget.classList.contains('drop-before');
-    if (isBefore) {
-        dropTarget.parentNode.insertBefore(draggedCard, dropTarget);
-    } else {
-        dropTarget.parentNode.insertBefore(draggedCard, dropTarget.nextSibling);
-    }
-    
-    cleanupDrag();
-    updateLocalStorage();
-}
-
-function handleDragEnd() {
-    cleanupDrag();
-}
-
-function cleanupDrag() {
-    if (draggedCard) {
-        draggedCard.classList.remove('dragging');
-    }
-    
-    document.querySelectorAll('.drop-before, .drop-after').forEach(el => {
-        el.classList.remove('drop-before', 'drop-after');
-    });
-    
-    draggedCard = null;
-    dropTarget = null;
 }
 
 // Update the toggleLeftPanel function to handle notepad width
@@ -1004,38 +928,130 @@ function toggleLeftPanel() {
     }
 }
 
-// Update the DOMContentLoaded event listener to load saved text area content
+// Update the DOMContentLoaded event listener
 document.addEventListener("DOMContentLoaded", function() {
+    const notepad = document.getElementById('notepad');
     const textArea = document.getElementById('full-text-entry');
+    
+    if (!notepad || !textArea) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    // Initialize auto-parsing
     initializeAutoParsing(textArea);
     
-    // Add sort button listeners
-    document.querySelectorAll('.sort-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const sortType = button.dataset.sort;
-            sortCards(sortType);
-            
-            // Update active state
-            document.querySelectorAll('.sort-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            button.classList.add('active');
-        });
-    });
-    
-    // Load saved content
-    chrome.storage.local.get([STORAGE_KEYS.CARDS, STORAGE_KEYS.TEXT_AREA], function(result) {
+    // Load saved content and only use text area content to generate cards
+    chrome.storage.local.get([STORAGE_KEYS.TEXT_AREA], function(result) {
         if (result[STORAGE_KEYS.TEXT_AREA]) {
             textArea.value = result[STORAGE_KEYS.TEXT_AREA];
             // Parse the loaded text to create cards
             parseNotes(result[STORAGE_KEYS.TEXT_AREA]);
         }
-        
-        if (result[STORAGE_KEYS.CARDS]) {
-            cardsArray = result[STORAGE_KEYS.CARDS];
-            renderCards();
+    });
+
+    const exportButton = document.querySelector('.export-button');
+    const exportOptions = document.querySelector('.export-options');
+
+    // Toggle menu on button click
+    exportButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportOptions.classList.toggle('show');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.export-dropdown')) {
+            exportOptions.classList.remove('show');
         }
     });
+
+    // Prevent menu from closing when clicking inside it
+    exportOptions.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Add export button listeners
+    document.querySelectorAll('.export-option').forEach(button => {
+        button.addEventListener('click', () => {
+            const action = button.dataset.action;
+            exportOptions.classList.remove('show'); // Hide menu after selection
+            switch (action) {
+                case 'clipboard':
+                    copyToClipboard();
+                    break;
+                case 'text':
+                    exportToPlainText();
+                    break;
+            }
+        });
+    });
+
+    // Add view toggle functionality
+    const viewToggle = document.querySelector('.view-toggle');
+    
+    // First load the saved view state
+    chrome.storage.local.get([STORAGE_KEYS.VIEW_STATE], function(result) {
+        const savedViewState = result[STORAGE_KEYS.VIEW_STATE];
+        
+        if (savedViewState) {
+            // If there are no cards, don't switch to card view regardless of saved state
+            if (notepad.children.length === 0 && savedViewState) {
+                saveViewState(false);
+                return;
+            }
+            
+            // Apply the saved view state
+            notepad.classList.toggle('active', savedViewState);
+            textArea.style.display = savedViewState ? 'none' : 'block';
+            viewToggle.textContent = savedViewState ? 'Show Text' : 'Show Cards';
+        }
+    });
+
+    viewToggle.addEventListener('click', () => {
+        const isCardView = !notepad.classList.contains('active');
+        
+        // If switching to card view but there are no cards, don't switch
+        if (isCardView && notepad.children.length === 0) {
+            return;
+        }
+        
+        // Toggle the views
+        notepad.classList.toggle('active');
+        textArea.style.display = isCardView ? 'none' : 'block';
+        viewToggle.textContent = isCardView ? 'Show Text' : 'Show Cards';
+        
+        // Save the new view state
+        saveViewState(isCardView);
+    });
+
+    // Add sort button functionality
+    const sortButtons = document.querySelectorAll('.sort-button');
+    sortButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const sortType = button.dataset.sort;
+            if (sortType) {
+                // Make sure we're in card view before sorting
+                const notepad = document.getElementById('notepad');
+                if (!notepad.classList.contains('active')) {
+                    notepad.classList.add('active');
+                    document.getElementById('full-text-entry').style.display = 'none';
+                    document.querySelector('.view-toggle').textContent = 'Show Text';
+                }
+                sortCards(sortType);
+            }
+        });
+    });
+
+    // Load saved theme
+    chrome.storage.local.get([STORAGE_KEYS.THEME], function(result) {
+        const savedTheme = result[STORAGE_KEYS.THEME] || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeButton(savedTheme);
+    });
+
+    // Add this to the DOMContentLoaded event listener, after loading the saved theme
+    document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
 });
 
 // Update the text area creation in your DOMContentLoaded event
@@ -1100,20 +1116,15 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Add sorting function
+// Update the sortCards function with simpler animation
 function sortCards(sortType) {
     const notepad = document.getElementById('notepad');
     const cards = Array.from(notepad.querySelectorAll('.card'));
     const textArea = document.getElementById('full-text-entry');
     
-    // Update active button state
-    document.querySelectorAll('.sort-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.textContent.toLowerCase().includes(sortType)) {
-            button.classList.add('active');
-        }
-    });
+    if (cards.length === 0) return; // Don't sort if there are no cards
     
+    // Sort the cards array based on the selected sort type
     if (sortType === 'text-order') {
         // Get all lines from text area that start with markers
         const lines = textArea.value.split('\n');
@@ -1132,8 +1143,12 @@ function sortCards(sortType) {
             const aContent = a.querySelector('.card-content').textContent.trim();
             const bContent = b.querySelector('.card-content').textContent.trim();
             
-            const aIndex = markerLines.findIndex(item => item.line.includes(aContent));
-            const bIndex = markerLines.findIndex(item => item.line.includes(bContent));
+            const aIndex = markerLines.findIndex(item => 
+                item.line.includes(aContent.substring(0, Math.min(aContent.length, 50)))
+            );
+            const bIndex = markerLines.findIndex(item => 
+                item.line.includes(bContent.substring(0, Math.min(bContent.length, 50)))
+            );
             
             return aIndex - bIndex;
         });
@@ -1154,9 +1169,36 @@ function sortCards(sortType) {
         });
     }
     
+    // Add sorting class to disable transitions temporarily
+    cards.forEach(card => {
+        card.classList.add('sorting');
+        card.classList.remove('sorting-animated', 'sorting-complete');
+    });
+    
+    // Force reflow
+    notepad.offsetHeight;
+    
     // Reappend cards in new order
-    cards.forEach(card => notepad.appendChild(card));
-    updateLocalStorage();
+    cards.forEach(card => {
+        notepad.appendChild(card);
+        // Add sorting-animated class after a brief delay to ensure transition works
+        requestAnimationFrame(() => {
+            card.classList.add('sorting-animated');
+        });
+    });
+    
+    // Add completion animation
+    cards.forEach(card => {
+        card.addEventListener('transitionend', function handler() {
+            card.removeEventListener('transitionend', handler);
+            card.classList.remove('sorting', 'sorting-animated');
+            card.classList.add('sorting-complete');
+            
+            setTimeout(() => {
+                card.classList.remove('sorting-complete');
+            }, 300);
+        }, { once: true });
+    });
 }
 
 // Add this function to scroll to and highlight text in textarea
@@ -1197,3 +1239,85 @@ document.addEventListener('click', (e) => {
         });
     }
 });
+
+// Add these export functions
+function formatCardsForExport() {
+    const cards = Array.from(document.querySelectorAll('.card'));
+    return cards.map((card, index) => {
+        const content = card.querySelector('.card-content').textContent.trim();
+        const type = card.querySelector('.card-tag').textContent.trim();
+        return `${index + 1}. ${content}\n   ${type}`;
+    }).join('\n\n');
+}
+
+function copyToClipboard() {
+    const formattedText = formatCardsForExport();
+    navigator.clipboard.writeText(formattedText)
+        .then(() => {
+            // Show success message
+            const button = document.querySelector('[data-action="clipboard"]');
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+        });
+}
+
+function exportToPlainText() {
+    const formattedText = formatCardsForExport();
+    const blob = new Blob([formattedText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `notes-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Add this function to save the view state
+function saveViewState(isCardView) {
+    chrome.storage.local.set({ 
+        [STORAGE_KEYS.VIEW_STATE]: isCardView 
+    }, function() {
+        if (chrome.runtime.lastError) {
+            console.error('Error saving view state:', chrome.runtime.lastError);
+        }
+    });
+}
+
+// Add this function to handle theme switching
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    updateThemeButton(newTheme);
+    saveTheme(newTheme);
+}
+
+// Update this function to handle theme button text
+function updateThemeButton(theme) {
+    const button = document.querySelector('.theme-toggle');
+    if (button) {
+        button.innerHTML = theme === 'dark' 
+            ? '☀️ Light Mode' 
+            : '🌙 Dark Mode';
+    }
+}
+
+// Add this function to save the theme preference
+function saveTheme(theme) {
+    chrome.storage.local.set({ 
+        [STORAGE_KEYS.THEME]: theme 
+    }, function() {
+        if (chrome.runtime.lastError) {
+            console.error('Error saving theme:', chrome.runtime.lastError);
+        }
+    });
+}
